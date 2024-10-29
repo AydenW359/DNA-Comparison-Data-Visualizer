@@ -1,0 +1,62 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib import cm
+from matplotlib.colors import ListedColormap, Normalize
+import matplotlib.patches as mpatches
+
+# Set up the circular layout
+num_chromosomes = 24  # Human chromosomes (1-22 + X, Y)
+species = ["Mouse", "Rat", "Dog", "Chimpanzee", "Chicken", "Frog", "Zebrafish"]
+
+theta = np.linspace(0, 2 * np.pi, num_chromosomes + 1)
+ribbons = np.random.rand(len(species), num_chromosomes)  # Mock synteny data
+conservation = np.random.rand(len(species), num_chromosomes)  # Mock conservation data
+
+fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(12, 10))
+ax.set_theta_offset(np.pi / 2)  # Rotate the plot so it starts from the top
+ax.set_theta_direction(-1)  # Clockwise
+
+# Plot chromosomes as bars around the circle and save their patches for the legend
+chromosome_patches = []
+for i in range(num_chromosomes):
+    color = cm.tab20(i)  # Use tab20 colormap for distinct chromosome colors
+    patch = mpatches.Patch(color=color, label=f"Chr {i+1}" if i < 22 else "Chr X/Y")
+    chromosome_patches.append(patch)
+    ax.bar(theta[i], 1, width=(2 * np.pi / num_chromosomes), bottom=1, color=color)
+
+# Add ribbons for synteny across species (inner track)
+for s_idx, specie in enumerate(species):
+    for i in range(num_chromosomes):
+        width = 2 * np.pi / num_chromosomes / len(species)
+        ax.bar(theta[i] + width * s_idx, ribbons[s_idx, i], width=width, bottom=0.5, color=cm.viridis(s_idx / len(species)))
+
+# Plot conservation data as exterior tracks (heatmap, histograms)
+for s_idx, specie in enumerate(species):
+    for i in range(num_chromosomes):
+        width = 2 * np.pi / num_chromosomes / len(species)
+        color = cm.viridis(conservation[s_idx, i])  # Conservation value as color
+        ax.bar(theta[i] + width * s_idx, conservation[s_idx, i], width=width, bottom=2, color=color)
+
+# Set title and layout
+ax.set_title("Sequence Conservation Across Species", va='bottom')
+ax.set_xticks(theta[:-1])  # Place ticks at each chromosome boundary
+ax.set_xticklabels([f"Chr {i+1}" if i < 22 else "Chr X/Y" for i in range(num_chromosomes)])
+
+# Remove radial ticks and labels
+ax.set_yticklabels([])
+ax.set_yticks([])
+
+# Create a colorbar for the conservation heatmap
+norm = Normalize(vmin=0, vmax=1)
+sm = plt.cm.ScalarMappable(cmap=cm.viridis, norm=norm)
+sm.set_array([])
+
+# Position colorbar to the right of the plot
+cbar = fig.colorbar(sm, ax=ax, orientation='vertical', pad=0.1, fraction=0.02)
+cbar.set_label('Sequence Conservation')
+
+# Add a legend for the chromosome colors
+plt.legend(handles=chromosome_patches, bbox_to_anchor=(1.2, 0.5), loc='center left', title="Chromosomes")
+
+plt.tight_layout()  # Adjust layout to make room for legends
+plt.show()
