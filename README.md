@@ -21,3 +21,13 @@ This project generates DNA samples, converts them to RNA, translates them to ami
 2. Install the required libraries:
    ```bash
    pip install matplotlib numpy
+
+### Set Up
+1. Open Final Test file
+2. Edit the 'Customize' section to your parameters
+  ![image](https://github.com/user-attachments/assets/83becf52-d820-41b4-addd-62d9a48d88b0)
+3. Run the file
+
+
+## Example of Program
+![image](https://github.com/user-attachments/assets/7f98fd1f-12ee-48ea-9b80-033ae7eebe07)
